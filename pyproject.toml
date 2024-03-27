@@ -9,6 +9,9 @@ packages = [{include = "knowledgeDB"}]
 [tool.poetry.dependencies]
 python = "^3.11"
 chromadb = "0.4.24"
+langchain = "0.1.13"
+sentence_transformers = "2.6.1"
+torch = "2.2.1"
 
 [tool.poetry.scripts]
 run_createDB_api = "knowledgeDB.createDB:run"
