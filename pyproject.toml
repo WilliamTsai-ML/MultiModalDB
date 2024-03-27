@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "expDB"
+version = "0.0.0"
+description = "Library to create DB"
+authors = ["William <william.wytsai@gmail.com>"]
+readme = "README.md"
+packages = [{include = "knowledgeDB"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+chromadb = "0.4.24"
+
+[tool.poetry.scripts]
+run_createDB_api = "knowledgeDB.createDB:run"
+run_searchDB_api = "knowledgeDB.searchDB:run"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
