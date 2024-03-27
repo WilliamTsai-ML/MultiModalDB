@@ -26,34 +26,44 @@ class DBobject:
         Add documents to the collection.
         '''
         assert self.language_model is not None, "Please set a language model first."
-        embeddings = []
+
         trunk_ids = []
+        trunks = []
+        embeddings = []
         metadatas = []
+
         for i, doc in enumerate(docs):
-            for j, chunk in enumerate(self.text_splitter.split_text(doc)):
+            for j, chunk in enumerate(doc.split("\n\n")):
                 trunk_ids.append(f"{ids[i]}_{j}")
-                embeddings.append(self.language_model.encode(chunk))
+                trunks.append(chunk)
+                embeddings.append(self.language_model.encode(chunk).tolist())
                 metadatas.append({"doc-id": ids[i], "doc-chunk": j})
         
         self.add_embeddings(
             ids=trunk_ids,
+            documents=trunks,
             embeddings=embeddings,
             metadatas=metadatas
         )
 
-    def add_embeddings(self, ids: list, embeddings: list, metadatas: list | None):
+    def add_embeddings(self, ids: list, embeddings: list, documents: list, metadatas: list | None):
         '''
         Add documents to the collection.
         '''
         self.collection.add(
             ids=ids,
             embeddings=embeddings,
+            documents=documents,
             metadatas=metadatas
         )
 
-    def query(self, query_text: str, n_results: int = 5):
+    def query(self, query_text: str, n_results: int = 3):
         query_emb = self.language_model.encode_query(query_text).tolist()
         results = self.collection.query(query_embeddings=[query_emb], n_results=n_results)
-        return [f"{r['doc-id']}_{r['doc-chunk']: d}" for r, d in zip(results['metadatas'][0], results['distances'][0])]
-
+        
+        query_results = []
+        for i, res in enumerate(results["ids"][0]):
+            query_results.append(f"{i}: {res} {results['metadatas'][0][i]} {results['documents'][0][i][:1000]}")
+        
+        return query_results
     
