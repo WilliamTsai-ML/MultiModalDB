@@ -1,0 +1,44 @@
+import time
+from sentence_transformers import SentenceTransformer
+import torch
+from transformers import BlipModel, AutoProcessor
+from PIL import Image
+class llmAPI:
+    def __init__(self, model_name: str = "mixedbread-ai/mxbai-embed-large-v1"):
+        """Loads the model from the given name."""
+        self.model_name = model_name
+        self.model = SentenceTransformer(model_name)
+        self.tokenizer = self.model.tokenizer
+
+    def encode(self, input_text: list):
+        """Encodes the given text using the model."""
+        return self.model.encode(input_text)
+    
+    def encode_query(self, query_text):
+        """Encodes the given query text using the model."""
+        return self.encode(f"'Represent this sentence for searching relevant passages: {query_text}")
+
+        
+class blipAPI:
+    def __init__(self, model_name: str = "Salesforce/blip-image-captioning-base"):
+        """Loads the model from the given name."""
+        self.model_name = model_name
+        self.model = BlipModel.from_pretrained(model_name)
+        self.processor = AutoProcessor.from_pretrained(model_name)
+
+    def encode(self, input: str | Image.Image):
+        """Encodes the given text or image using the model."""
+        if isinstance(input, str):
+            text_input = self.processor(text=input, return_tensors="pt")
+            return self.model.get_text_features(**text_input)[0]
+        elif isinstance(input, Image.Image):
+            image_input = self.processor(images=input, return_tensors="pt")
+            return self.model.get_image_features(**image_input)[0]
+        else:
+            raise ValueError("Input must be a string or an Image object.")
+    
+    def encode_query(self, query_text):
+        """Encodes the given query text using the model."""
+        return self.encode(query_text)
+
+        

@@ -1,7 +1,8 @@
 import os
 from pathlib import Path
+from PIL import Image
 from knowledgeDB.dbAPI import DBobject
-from knowledgeDB.llmAPI import llmAPI
+from knowledgeDB.encoderAPI import blipAPI, llmAPI
 
 
 def run():
@@ -9,13 +10,19 @@ def run():
 
     db = DBobject()
     llm = llmAPI()
+    blip = blipAPI()
     db.set_language_model(llm)
+    db.set_blip_model(blip)
     
     docs = []
     file_names = []
     for file in os.listdir("./docs"):
-        with open(f"./docs/{file}", "r") as f:
-            docs.append(f.read())
+        if file.endswith(".txt"):
+            with open(f"./docs/{file}", "r") as f:
+                docs.append(f.read())
+                file_names.append(Path(file))
+        if file.endswith(".jpg"):
+            docs.append(Image.open(f"./docs/{file}"))
             file_names.append(Path(file))
         print(f"Processed {file}")
     
