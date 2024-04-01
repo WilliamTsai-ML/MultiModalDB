@@ -24,7 +24,7 @@ Top document results:
 1: news_google_2 {'doc-chunk': 2, 'doc-id': 'news_google'} Android is the most popular MobileOS in terms of number of users.
 2: news_apple_0 {'doc-chunk': 0, 'doc-id': 'news_apple'} Apple is releasing the new phone in June.
 Top image results:
-0: galaxy
-1: desktop
+0: iphone15
+1: galaxy
 2: ipad
 ```
