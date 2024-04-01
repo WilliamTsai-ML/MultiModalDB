@@ -10,8 +10,8 @@ class DBobject:
         Constructor for the DB object class.
         '''
         self.client = chromadb.PersistentClient(path=str(db_path))
-        self.text_collection = self.client.get_or_create_collection(name=collection+"_text")
-        self.image_collection = self.client.get_or_create_collection(name=collection+"_image")
+        self.text_collection = self.client.get_or_create_collection(name=collection+"_text", metadata={"hnsw:space": "cosine"})
+        self.image_collection = self.client.get_or_create_collection(name=collection+"_image", metadata={"hnsw:space": "cosine"})
         self.language_model = None
         self.blip_model = None
         self.text_splitter = None
@@ -28,6 +28,10 @@ class DBobject:
         Set the language model to use.
         '''
         self.blip_model = model
+
+    def to(self, device):
+        self.language_model.model.to(device)
+        self.blip_model.model.to(device)
 
     def add(self, ids: list, docs: list):
         '''
@@ -66,7 +70,7 @@ class DBobject:
             embeddings=image_embeddings
         )
 
-    def query(self, query_text: str, n_results: int = 3):
+    def query(self, query_text: str, n_results: int = 10):
         '''Query the database for matching results.'''
         text_query_emb = self.language_model.encode_query(query_text).tolist()
         results = self.text_collection.query(query_embeddings=[text_query_emb], n_results=n_results)

@@ -1,7 +1,9 @@
 import time
 from sentence_transformers import SentenceTransformer
 import torch
-from transformers import BlipModel, AutoProcessor
+from transformers import BlipProcessor, BlipModel, logging
+logging.set_verbosity_error()
+
 from PIL import Image
 class llmAPI:
     def __init__(self, model_name: str = "mixedbread-ai/mxbai-embed-large-v1"):
@@ -17,6 +19,11 @@ class llmAPI:
     def encode_query(self, query_text):
         """Encodes the given query text using the model."""
         return self.encode(f"'Represent this sentence for searching relevant passages: {query_text}")
+    
+    def to(self, device):
+        """Moves the model to the given device."""
+        self.model = self.model.to(device)
+        return self
 
         
 class blipAPI:
@@ -24,7 +31,7 @@ class blipAPI:
         """Loads the model from the given name."""
         self.model_name = model_name
         self.model = BlipModel.from_pretrained(model_name)
-        self.processor = AutoProcessor.from_pretrained(model_name)
+        self.processor = BlipProcessor.from_pretrained(model_name)
 
     def encode(self, input: str | Image.Image):
         """Encodes the given text or image using the model."""
@@ -40,5 +47,10 @@ class blipAPI:
     def encode_query(self, query_text):
         """Encodes the given query text using the model."""
         return self.encode(query_text)
+    
+    def to(self, device):
+        """Moves the model to the given device."""
+        self.model = self.model.to(device)
+        return self
 
         

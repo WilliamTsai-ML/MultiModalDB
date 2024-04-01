@@ -6,8 +6,8 @@ from knowledgeDB.encoderAPI import blipAPI, llmAPI
 def run():
 
     db = DBobject()
-    llm = llmAPI()
-    blip = blipAPI()
+    llm = llmAPI().to("cuda")
+    blip = blipAPI().to("cuda")
     db.set_language_model(llm)
     db.set_blip_model(blip)
 
