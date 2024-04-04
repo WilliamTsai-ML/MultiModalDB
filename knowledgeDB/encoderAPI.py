@@ -1,7 +1,5 @@
-import time
 from sentence_transformers import SentenceTransformer
-import torch
-from transformers import BlipProcessor, BlipModel, logging
+from transformers import AutoModel,AutoProcessor, logging
 logging.set_verbosity_error()
 
 from PIL import Image
@@ -27,16 +25,16 @@ class llmAPI:
 
         
 class blipAPI:
-    def __init__(self, model_name: str = "Salesforce/blip-image-captioning-base"):
+    def __init__(self, model_name: str = "openai/clip-vit-large-patch14"):
         """Loads the model from the given name."""
         self.model_name = model_name
-        self.model = BlipModel.from_pretrained(model_name)
-        self.processor = BlipProcessor.from_pretrained(model_name)
+        self.model = AutoModel.from_pretrained(model_name)
+        self.processor = AutoProcessor.from_pretrained(model_name)
 
     def encode(self, input: str | Image.Image):
         """Encodes the given text or image using the model."""
         if isinstance(input, str):
-            text_input = self.processor(text=input, return_tensors="pt")
+            text_input = self.processor(text=input, return_tensors="pt").to("cuda")
             return self.model.get_text_features(**text_input)[0]
         elif isinstance(input, Image.Image):
             image_input = self.processor(images=input, return_tensors="pt")
@@ -46,7 +44,7 @@ class blipAPI:
     
     def encode_query(self, query_text):
         """Encodes the given query text using the model."""
-        return self.encode(query_text)
+        return self.encode("A photo of a " + query_text)
     
     def to(self, device):
         """Moves the model to the given device."""

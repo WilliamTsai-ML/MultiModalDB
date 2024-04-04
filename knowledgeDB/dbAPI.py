@@ -70,7 +70,7 @@ class DBobject:
             embeddings=image_embeddings
         )
 
-    def query(self, query_text: str, n_results: int = 10):
+    def query(self, query_text: str, n_results: int = 3):
         '''Query the database for matching results.'''
         text_query_emb = self.language_model.encode_query(query_text).tolist()
         results = self.text_collection.query(query_embeddings=[text_query_emb], n_results=n_results)
@@ -82,8 +82,8 @@ class DBobject:
         image_query_embedding = self.blip_model.encode_query(str(query_text)).tolist()
         results = self.image_collection.query(query_embeddings=[image_query_embedding], n_results=n_results)
         query_image_results = []
-        for i, (_, res) in enumerate(sorted(zip(results['distances'][0], results["ids"][0]))):
-            query_image_results.append(f"{i}: {res}")
+        for i, (d, res) in enumerate(sorted(zip(results['distances'][0], results["ids"][0]))):
+            query_image_results.append(f"{i}: {res} ({d})")
 
         return query_text_results, query_image_results
     
